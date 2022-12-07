@@ -7,4 +7,11 @@ function getProducts(url , query) {
     return axios.get(activeQuery);
 }
 
-export default { getProducts }
+function getQuery(url, queryParams) {
+    const target = {
+        params : queryParams
+    };
+    return axios.get(url, target);
+}
+
+export default { getProducts, getQuery }

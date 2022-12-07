@@ -1,10 +1,9 @@
 <template>
   <div class="app">
     <main>
-      <div>
-            <input type="text"/>
-        </div>
 
+        <SearchInput v-model="searchKeyword" @search="searchProducts"></SearchInput>
+        
         <div>
             <ul>
                 <li v-for="product in products" :key="product.id" class="item flex"
@@ -17,18 +16,23 @@
             </ul>
         </div>
 
+        <div class="cart-wrapper">
+          <button class="btn" @click="moveToCartPage">Go to Cart</button>
+        </div>
     </main>
   </div>
 </template>
 
 <script>
 import insAxios from "../api/index"
+import SearchInput from "../components/SerchInput.vue"
 
 export default {
-  components: {},
+  components: { SearchInput },
   data() {
         return {
             products: [],
+            searchKeyword: '',
         };
     },
   async created() {
@@ -36,6 +40,7 @@ export default {
     const products = [];
     if(response.data !== undefined) {
         response.data.products.forEach(item => {
+            item.imageUrl = item.imageUrl + '?random=' + Math.random();
             products.push(item);
         });
     }
@@ -45,48 +50,25 @@ export default {
     moveToDetailPage(id) {
       console.log(id);
       this.$router.push('detail/' + id);
+    },
+
+    updateSearchKeyword(keyword) {
+      this.searchKeyword = keyword;
+    },
+
+    async searchProducts() {
+      const params = {'keyword': this.searchKeyword};
+      console.log(params);
+      const response = await insAxios.getQuery('/api/products', params);
+      console.log('search keyword res : ' + response.data);
+    },
+
+    moveToCartPage() {
+      this.$router.push('/cart');
     }
   }
 }
 </script>
 
-<style scoped>
-.flex {
-  display: flex;
-  justify-content: center;
-}
-
-.item {
-  display: inline-block;
-  width: 400px;
-  height: 300px;
-  text-align: center;
-  margin: 0 0.5rem;
-  cursor: pointer;
-}
-
-.product-image {
-  width: 400px;
-  height: 250px;
-}
-
-.app {
-  position: relative;
-}
-
-.cart-wrapper {
-  position: sticky;
-  float: right;
-  bottom: 50px;
-  right: 50px;
-}
-
-.cart-wrapper .btn {
-  display: inline-block;
-  height: 40px;
-  font-size: 1rem;
-  font-weight: 500;
-}
-</style>
 
 
